@@ -58,23 +58,21 @@ html,body,[class*="css"]{{font-family:'Inter',sans-serif;transition:background-c
 .stChatInput{{position:fixed!important;bottom:45px!important;left:50%!important;transform:translateX(-50%)!important;width:calc(100% - 20px)!important;max-width:48rem!important;padding:0 1rem!important;background:{T['bg']}!important;z-index:1001!important;min-height:52px!important;transition:all 0.5s ease}}
 .stChatInput>div{{background-color:{T['bg']}!important;border:1.5px solid {T['primary']}!important;border-radius:28px!important;padding:4px 8px!important;min-height:52px!important;transition:all 0.5s ease}}
 .stChatInput textarea{{font-size:1rem!important;min-height:42px!important;color:{T['text']}!important;transition:color 0.5s ease}}
-/* Fix preview file biar gak numpuk input */
 [data-testid="stFileUploader"]{{margin-bottom:8px!important}}
-/* Tombol + Upload: MERAH, dipencet jadi PUTIH */
 .stChatInput button[kind="secondary"] svg{{fill:#EF4444!important;transition:fill 0.2s ease}}
 .stChatInput button[kind="secondary"]:active svg{{fill:#FFFFFF!important}}
 .stChatInput button[kind="secondary"]:hover svg{{fill:#DC2626!important}}
-/* Tombol send */
 .stChatInput button[kind="primary"] svg{{fill:{T['primary']}!important;transition:fill 0.5s ease}}
 .orion-badge{{display:inline-block;font-size:.7rem;padding:4px 10px;border-radius:12px;margin-bottom:10px;margin-right:6px;font-weight:600;background-color:{T['badge_bg']};color:{T['badge_text']};border:1px solid {T['border']};transition:all 0.5s ease}}
 .model-badge{{background:#A78BFA;color:white}}
 .footer-fnl{{position:fixed;bottom:8px;left:16px;transform:none;font-size:0.7rem;color:{T['badge_text']};z-index:1000;transition:color 0.5s ease}}
-.typing-indicator{{display:flex;align-items:center;gap:12px;padding:12px 4px;height:40px}}
-.typing-indicator span{{width:12px;height:12px;background-color:#000;border-radius:50%;display:inline-block;animation:wave 1.8s infinite ease-in-out}}
-.typing-indicator span:nth-child(1){{animation-delay:0s}}
-.typing-indicator span:nth-child(2){{animation-delay:0.2s}}
-.typing-indicator span:nth-child(3){{animation-delay:0.4s}}
-@keyframes wave{{0%,60%,100%{{transform:translateY(0)}} 30%{{transform:translateY(-16px)}}}}
+
+/* ANIMASI LOADING 3 TITIK */
+.typing-indicator{{display:flex;align-items:center;gap:8px;padding:12px 4px;height:40px}}
+.typing-indicator span{{width:10px;height:10px;background-color:{T['text']};border-radius:50%;display:inline-block;animation:bounce 1.4s infinite ease-in-out both}}
+.typing-indicator span:nth-child(1){{animation-delay:-0.32s}}
+.typing-indicator span:nth-child(2){{animation-delay:-0.16s}}
+@keyframes bounce{{0%,80%,100%{{transform:scale(0)}} 40%{{transform:scale(1)}}}}
 </style>""", unsafe_allow_html=True)
 
 try:
@@ -184,7 +182,7 @@ def kirim_ke_ai(prompt, image=None):
     full_p = sys_p + f"\n\nJenis: {tingkat}\nPertanyaan user: {prompt}"
     loading_placeholder = st.empty()
     with loading_placeholder.container():
-        with st.chat_message("assistant"): st.markdown('<div class="typing-indicator"><span></span><span></div>', unsafe_allow_html=True)
+        with st.chat_message("assistant"): st.markdown('<div class="typing-indicator"><span></span><span></span></div>', unsafe_allow_html=True)
     
     model_order = [ss.selected_model]
     if ss.selected_model == "gemini": model_order += ["groq", "deepseek"]
@@ -272,7 +270,7 @@ if prompt:
     if ss.chat_count >= MAX_CHAT: st.error("Sesi ngobrol hari ini sudah habis. Silakan kembali besok 🙏"); st.stop()
     ss.chat_count += 1
     user_text = prompt.text if hasattr(prompt, 'text') else (prompt.get("text", "") if isinstance(prompt, dict) else prompt)
-    user_file = prompt.files[0] if hasattr(prompt, 'files') and prompt.files else (prompt.get("files", [None])[0] if isinstance(prompt, dict) and prompt.get("files") else None)  # <- Kurung tutup udah bener
+    user_file = prompt.files[0] if hasattr(prompt, 'files') and prompt.files else (prompt.get("files", [None])[0] if isinstance(prompt, dict) and prompt.get("files") else None)
     user_img = None
     if user_file: user_img = Image.open(user_file).convert("RGB"); ss.messages.append({"role": "user", "type": "image", "content": user_img})
     if user_text: ss.messages.append({"role": "user", "type": "text", "content": user_text})
